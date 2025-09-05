@@ -1,6 +1,5 @@
 package com.medical.interceptor;
 
-import com.medical.constant.JwtClaimsConstant;
 import com.medical.context.BaseContext;
 import com.medical.properties.JwtProperties;
 import com.medical.utils.JwtUtil;
@@ -14,7 +13,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
- * jwt令牌校验的拦截器
+ * 校验管理端令牌
  */
 @Component
 @Slf4j
@@ -25,12 +24,10 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
     /**
      * 校验jwt
-     *
-     * @param request
-     * @param response
-     * @param handler
-     * @return
-     * @throws Exception
+     * @param request HttpServletRequest
+     * @param response  HttpServletResponse
+     * @param handler Object（实际上是HandlerMethod）
+     * @return  boolean
      */
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //判断当前拦截到的是Controller的方法还是其他资源
@@ -46,9 +43,9 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
         try {
             log.info("jwt校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getAdminSecretKey(), token);
-            Long empId = Long.valueOf(claims.get(JwtClaimsConstant.EMP_ID).toString());
-            log.info("当前员工id：", empId);
-            BaseContext.setCurrentId(empId);
+            Long adminId = Long.valueOf(claims.get("adminId").toString());
+            log.info("当前员工id：{}", adminId);
+            BaseContext.setCurrentId(adminId);
             //3、通过，放行
             return true;
         } catch (Exception ex) {

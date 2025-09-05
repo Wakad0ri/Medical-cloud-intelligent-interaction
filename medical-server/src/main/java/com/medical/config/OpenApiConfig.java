@@ -13,9 +13,9 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
- * OpenAPI 3.0 配置
+ * OpenAPI 3.0 配置 - 临时禁用
  */
-@Configuration
+//@Configuration
 @Slf4j
 public class OpenApiConfig {
 
