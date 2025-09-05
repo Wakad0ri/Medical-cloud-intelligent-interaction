@@ -4,9 +4,9 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+@Data
 @Component
 @ConfigurationProperties(prefix = "medical.jwt")
-@Data
 public class JwtProperties {
 
     /**
@@ -15,6 +15,13 @@ public class JwtProperties {
     private String adminSecretKey;
     private long adminTtl;
     private String adminTokenName;
+
+    /**
+     * 医生端生成jwt令牌相关配置
+     */
+    private String doctorSecretKey;
+    private long doctorTtl;
+    private String doctorTokenName;
 
     /**
      * 用户端微信用户生成jwt令牌相关配置

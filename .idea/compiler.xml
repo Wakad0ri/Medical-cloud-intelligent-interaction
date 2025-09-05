@@ -7,11 +7,21 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Medical cloud intelligent interaction" />
+      </profile>
+      <profile name="Annotation profile for medical-cloud" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="D:/Maven/mvn_repo/org/projectlombok/lombok/1.18.30/lombok-1.18.30.jar" />
+        </processorPath>
         <module name="medical-common" />
         <module name="medical-pojo" />
         <module name="medical-server" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Medical cloud intelligent interaction" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

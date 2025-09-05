@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -25,11 +25,17 @@
         <spring-boot.version>3.2.0</spring-boot.version>
         <mysql.version>8.0.33</mysql.version>
         <mybatis-plus.version>3.5.4</mybatis-plus.version>
-        <redis.version>3.2.0</redis.version>
-        <jwt.version>0.11.5</jwt.version>
-        <fastjson.version>2.0.43</fastjson.version>
+        <mybatis.spring>3.0.3</mybatis.spring>
+        <druid.version>1.2.21</druid.version>
+        <fastjson2.version>2.0.47</fastjson2.version>
+        <commons.lang3.version>3.14.0</commons.lang3.version>
+        <pagehelper.version>1.4.7</pagehelper.version>
+        <jwt.version>0.12.5</jwt.version>
         <lombok.version>1.18.30</lombok.version>
         <knife4j.version>4.3.0</knife4j.version>
+        <aspectj.version>1.9.21</aspectj.version>
+        <jaxb-api.version>4.0.1</jaxb-api.version>
+        <poi.version>5.2.5</poi.version>
         <springdoc.version>2.2.0</springdoc.version>
     </properties>
 
@@ -46,9 +52,16 @@
 
             <!-- MySQL -->
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql.version}</version>
+            </dependency>
+
+            <!-- Druid数据源 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-3-starter</artifactId>
+                <version>${druid.version}</version>
             </dependency>
 
             <!-- MyBatis Plus -->
@@ -58,11 +71,39 @@
                 <version>${mybatis-plus.version}</version>
             </dependency>
 
+            <!-- MyBatis Spring -->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis.spring}</version>
+            </dependency>
+
+            <!-- FastJSON2 -->
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+
+            <!-- Commons Lang3 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+
+            <!-- PageHelper -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper.version}</version>
+            </dependency>
+
             <!-- Redis -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-data-redis</artifactId>
-                <version>${redis.version}</version>
+                <version>${spring-boot.version}</version>
             </dependency>
 
             <!-- JWT -->
@@ -82,12 +123,14 @@
                 <version>${jwt.version}</version>
             </dependency>
 
-            <!-- FastJSON -->
+            <!-- JAXB API -->
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson2</artifactId>
-                <version>${fastjson.version}</version>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>${jaxb-api.version}</version>
             </dependency>
+
+
 
             <!-- Lombok -->
             <dependency>
@@ -121,6 +164,13 @@
                 <configuration>
                     <source>17</source>
                     <target>17</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
         </plugins>

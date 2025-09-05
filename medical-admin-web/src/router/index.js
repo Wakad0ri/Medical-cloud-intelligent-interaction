@@ -1,66 +1,44 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { useAdminStore } from '@/stores/admin'
 
 const routes = [
   {
-    path: '/login',
-    name: 'Login',
-    component: () => import('@/views/login/index.vue'),
-    meta: { title: '登录' }
+    path: '/',
+    redirect: '/login'
   },
   {
-    path: '/',
-    name: 'Layout',
-    component: () => import('@/layout/index.vue'),
-    redirect: '/dashboard',
+    path: '/login',
+    name: 'AdminLogin',
+    component: () => import('@/views/login/index.vue'),
+    meta: { title: '管理员登录' }
+  },
+  {
+    path: '/doctor/login',
+    name: 'DoctorLogin',
+    component: () => import('@/views/login/doctor.vue'),
+    meta: { title: '医生登录' }
+  },
+  {
+    path: '/user/login',
+    name: 'PatientLogin',
+    component: () => import('@/views/login/patient.vue'),
+    meta: { title: '患者登录' }
+  },
+  {
+    path: '/admin',
+    name: 'AdminLayout',
+    component: () => import('@/views/admin/index.vue'),
+    meta: { title: '管理员后台', requiresAuth: true },
     children: [
       {
+        path: '',
+        redirect: '/admin/dashboard'
+      },
+      {
         path: 'dashboard',
-        name: 'Dashboard',
+        name: 'AdminDashboard',
         component: () => import('@/views/dashboard/index.vue'),
-        meta: { title: '首页', icon: 'House' }
-      },
-      {
-        path: 'users',
-        name: 'Users',
-        component: () => import('@/views/users/index.vue'),
-        meta: { title: '用户管理', icon: 'User' }
-      },
-      {
-        path: 'doctors',
-        name: 'Doctors',
-        component: () => import('@/views/doctors/index.vue'),
-        meta: { title: '医生管理', icon: 'Avatar' }
-      },
-      {
-        path: 'departments',
-        name: 'Departments',
-        component: () => import('@/views/departments/index.vue'),
-        meta: { title: '科室管理', icon: 'OfficeBuilding' }
-      },
-      {
-        path: 'appointments',
-        name: 'Appointments',
-        component: () => import('@/views/appointments/index.vue'),
-        meta: { title: '预约管理', icon: 'Calendar' }
-      },
-      {
-        path: 'consultations',
-        name: 'Consultations',
-        component: () => import('@/views/consultations/index.vue'),
-        meta: { title: 'AI问诊', icon: 'ChatDotRound' }
-      },
-      {
-        path: 'health-records',
-        name: 'HealthRecords',
-        component: () => import('@/views/health-records/index.vue'),
-        meta: { title: '健康档案', icon: 'Document' }
-      },
-      {
-        path: 'statistics',
-        name: 'Statistics',
-        component: () => import('@/views/statistics/index.vue'),
-        meta: { title: '数据统计', icon: 'DataAnalysis' }
+        meta: { title: '管理员首页', requiresAuth: true }
       }
     ]
   }
@@ -73,12 +51,20 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  const userStore = useUserStore()
-  
-  if (to.path === '/login') {
-    next()
+  const adminStore = useAdminStore()
+
+  const loginPaths = ['/login', '/doctor/login', '/user/login']
+
+  if (loginPaths.includes(to.path)) {
+    // 如果已经登录，跳转到对应的主页
+    if (adminStore.token) {
+      next('/admin')
+    } else {
+      next()
+    }
   } else {
-    if (userStore.token) {
+    // 需要登录的页面
+    if (adminStore.token) {
       next()
     } else {
       next('/login')

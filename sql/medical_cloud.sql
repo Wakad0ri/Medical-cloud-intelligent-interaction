@@ -17,12 +17,8 @@ CREATE TABLE `user` (
   `age` int DEFAULT NULL COMMENT '年龄',
   `id_card` varchar(18) DEFAULT NULL COMMENT '身份证号',
   `avatar` varchar(500) DEFAULT NULL COMMENT '头像',
-  `user_type` tinyint NOT NULL DEFAULT '1' COMMENT '用户类型 1-患者 2-医生 3-管理员',
-  `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态 1-正常 0-禁用',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `create_user` bigint DEFAULT NULL COMMENT '创建人',
-  `update_user` bigint DEFAULT NULL COMMENT '修改人',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_username` (`username`),
   KEY `idx_phone` (`phone`)
@@ -41,8 +37,6 @@ CREATE TABLE `department` (
   `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态 1-正常 0-停用',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `create_user` bigint DEFAULT NULL COMMENT '创建人',
-  `update_user` bigint DEFAULT NULL COMMENT '修改人',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='科室表';
@@ -64,21 +58,44 @@ CREATE TABLE `doctor` (
   `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态 1-在职 0-离职',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `create_user` bigint DEFAULT NULL COMMENT '创建人',
-  `update_user` bigint DEFAULT NULL COMMENT '修改人',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_doctor_no` (`doctor_no`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_department_id` (`department_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='医生表';
 
+-- 管理员表
+create table `admin` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `username` varchar(32) NOT NULL COMMENT '用户名',
+  `password` varchar(64) NOT NULL COMMENT '密码',
+  `real_name` varchar(32) DEFAULT NULL COMMENT '真实姓名',
+  `phone` varchar(11) DEFAULT NULL COMMENT '手机号',
+    `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态 1-正常 0-停用',
+  `id_card` varchar(18) DEFAULT NULL COMMENT '身份证号',
+  `email` varchar(64) DEFAULT NULL COMMENT '邮箱',
+  `gender` tinyint DEFAULT NULL COMMENT '性别 1-男 2-女',
+  `age` int DEFAULT NULL COMMENT '年龄',
+    `avatar` varchar(500) DEFAULT NULL COMMENT '头像',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `create_admin` bigint DEFAULT NULL COMMENT '创建者ID',
+    `update_admin` bigint DEFAULT NULL COMMENT '更新者ID',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_username` (`username`)
+)
+
+
+
 -- 插入初始数据
-INSERT INTO `user` (`username`, `password`, `real_name`, `user_type`, `status`) VALUES
-('admin', '$2a$10$7JB720yubVSOfvVMe6LjqeHrv6/CPMPX4Fv6o/Mr5iPVXLpFKtDaa', '系统管理员', 3, 1),
-('doctor001', '$2a$10$7JB720yubVSOfvVMe6LjqeHrv6/CPMPX4Fv6o/Mr5iPVXLpFKtDaa', '张医生', 2, 1),
-('patient001', '$2a$10$7JB720yubVSOfvVMe6LjqeHrv6/CPMPX4Fv6o/Mr5iPVXLpFKtDaa', '李患者', 1, 1);
+
+
 
 INSERT INTO `department` (`name`, `code`, `description`, `location`, `phone`) VALUES
 ('内科', 'NK001', '内科诊疗', '1楼101室', '010-12345678'),
 ('外科', 'WK001', '外科诊疗', '2楼201室', '010-12345679'),
 ('儿科', 'EK001', '儿科诊疗', '3楼301室', '010-12345680');
+
+-- 给admin表插入一条数据
+INSERT INTO `admin` (`username`, `password`, `real_name`, `phone`, `status`, `id_card`, `email`, `gender`, `age`, `avatar`, `create_time`, `update_time`, `create_admin`, `update_admin`) VALUES
+("admin", "e10adc3949ba59abbe56e057f20f883e", "管理员", "13888888888", 1, "420000000000000000", "admin@example.com", 1, 18, "https://example.com/avatar.jpg", "2023-07-01 00:00:00", "2023-07-01 00:00:00", NULL, NULL)
