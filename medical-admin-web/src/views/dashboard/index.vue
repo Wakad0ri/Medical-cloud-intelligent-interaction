@@ -15,7 +15,7 @@
           </div>
         </el-card>
       </el-col>
-      
+
       <el-col :span="6">
         <el-card class="stats-card">
           <div class="stats-content">
@@ -29,7 +29,7 @@
           </div>
         </el-card>
       </el-col>
-      
+
       <el-col :span="6">
         <el-card class="stats-card">
           <div class="stats-content">
@@ -43,7 +43,7 @@
           </div>
         </el-card>
       </el-col>
-      
+
       <el-col :span="6">
         <el-card class="stats-card">
           <div class="stats-content">
@@ -69,7 +69,7 @@
           <div ref="userTrendChart" style="height: 300px;"></div>
         </el-card>
       </el-col>
-      
+
       <el-col :span="12">
         <el-card>
           <template #header>
@@ -96,6 +96,10 @@
               <el-icon><Avatar /></el-icon>
               医生管理
             </el-button>
+            <el-button type="danger" @click="$router.push('/admin/employees')">
+              <el-icon><UserFilled /></el-icon>
+              员工管理
+            </el-button>
             <el-button type="warning" @click="$router.push('/appointments')">
               <el-icon><Calendar /></el-icon>
               预约管理
@@ -114,6 +118,7 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick } from 'vue'
 import * as echarts from 'echarts'
+import { User, Avatar, UserFilled, Calendar, ChatDotRound } from '@element-plus/icons-vue'
 
 const userTrendChart = ref()
 const appointmentChart = ref()

@@ -51,13 +51,13 @@ public class Admin implements Serializable {
     private LocalDateTime createTime;
 
     @Schema(description = "创建人")
-    private LocalDateTime createAdmin;
+    private Long createAdmin;
 
     @Schema(description = "更新时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")    // LocalDateTime格式化
     private LocalDateTime updateTime;
 
     @Schema(description = "更新人")
-    private LocalDateTime updateAdmin;
+    private Long updateAdmin;
 
 }

@@ -1,5 +1,6 @@
 package com.medical.service.impl;
 
+import com.medical.dto.AdminAddDTO;
 import com.medical.dto.AdminLoginDTO;
 import com.medical.entity.Admin;
 import com.medical.exception.AdminStatusErrorException;
@@ -7,14 +8,16 @@ import com.medical.exception.PasswordErrorException;
 import com.medical.exception.UsernameNotFoundException;
 import com.medical.mapper.AdminMapper;
 import com.medical.service.AdminService;
-import com.medical.vo.AdminLoginVO;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 @Service // SpringIOC注解
 @Tag(name = "管理端-管理员服务接口")
+@Slf4j
 public class AdminServiceImpl implements AdminService {
 
     @Autowired
@@ -48,5 +51,27 @@ public class AdminServiceImpl implements AdminService {
 
         // 3. 返回实体类对象，登录成功
         return admin;
+    }
+
+    /**
+     * 新增管理员
+     * @param adminAddDTO 管理员信息
+     */
+    @Override
+    public void add(AdminAddDTO adminAddDTO) {
+        Admin admin = new Admin();
+        BeanUtils.copyProperties(adminAddDTO, admin);
+        // TODO：密码需要加密，至于更新/创建 时间/人 需要用AOP或者注解实现
+        String password = DigestUtils.md5DigestAsHex(adminAddDTO.getPassword().getBytes());
+        BeanUtils.copyProperties(adminAddDTO, admin);
+        admin.setPassword(password);
+        admin.setStatus(1);
+        try {
+            adminMapper.insert(admin);
+        } catch (Exception e) {
+            log.error("添加管理员异常！", e);
+        }
+
+        log.info("添加管理员：{}", admin);
     }
 }

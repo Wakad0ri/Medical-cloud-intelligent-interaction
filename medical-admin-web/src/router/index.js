@@ -39,6 +39,18 @@ const routes = [
         name: 'AdminDashboard',
         component: () => import('@/views/dashboard/index.vue'),
         meta: { title: '管理员首页', requiresAuth: true }
+      },
+      {
+        path: 'employees',
+        name: 'EmployeeManagement',
+        component: () => import('@/views/admin/list.vue'),
+        meta: { title: '员工管理', requiresAuth: true }
+      },
+      {
+        path: 'add',
+        name: 'AdminAdd',
+        component: () => import('@/views/admin/add.vue'),
+        meta: { title: '新增员工', requiresAuth: true }
       }
     ]
   }
