@@ -71,6 +71,10 @@ spring:
       database: 3
 
 mybatis-plus:
+  # 配置XML映射文件位置
+  mapper-locations: classpath:com/medical/mapper/*.xml
+  # 配置实体类别名包，这样XML中可以直接使用类名
+  type-aliases-package: com.medical.entity
   configuration:
     #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
     map-underscore-to-camel-case: true

@@ -1,7 +1,9 @@
 package com.medical.controller.admin;
 
 import com.medical.dto.AdminAddDTO;
+import com.medical.dto.AdminPageQueryDTO;
 import com.medical.properties.JwtProperties;
+import com.medical.result.PageResult;
 import com.medical.utils.JwtUtil;
 import com.medical.dto.AdminLoginDTO;
 import com.medical.entity.Admin;
@@ -88,6 +90,14 @@ public class AdminController {
         log.info("添加管理员：{}", adminAddDTO);
         adminService.add(adminAddDTO);
         return Result.success();
+    }
+
+    @GetMapping("/page")
+    @Operation(summary = "分页查询管理员")
+    public Result<PageResult> page(AdminPageQueryDTO adminPageQueryDTO){
+        log.info("分页查询管理员：{}", adminPageQueryDTO);
+        PageResult pageResult = adminService.page(adminPageQueryDTO);
+        return Result.success(pageResult);
     }
 
 

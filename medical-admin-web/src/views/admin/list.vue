@@ -2,31 +2,27 @@
   <div class="admin-management">
     <!-- 搜索区域 -->
     <el-card class="search-card">
-      <el-form :model="searchForm" :inline="true" class="search-form">
-        <el-form-item label="员工姓名">
-          <el-input
-            v-model="searchForm.realName"
-            placeholder="请输入员工姓名"
-            clearable
-            style="width: 200px"
-          />
-        </el-form-item>
-        <el-form-item label="用户名">
-          <el-input
-            v-model="searchForm.username"
-            placeholder="请输入用户名"
-            clearable
-            style="width: 200px"
-          />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择状态" style="width: 120px">
-            <el-option label="全部" value="" />
-            <el-option label="启用" value="1" />
-            <el-option label="禁用" value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
+      <div class="search-container">
+        <div class="search-left">
+          <el-form :model="searchForm" :inline="true" class="search-form">
+            <el-form-item label="员工姓名">
+              <el-input
+                v-model="searchForm.name"
+                placeholder="请输入员工姓名"
+                clearable
+                style="width: 200px"
+              />
+            </el-form-item>
+            <el-form-item label="账号状态">
+              <el-select v-model="searchForm.status" placeholder="请选择账号状态" style="width: 150px">
+                <el-option label="全部" value="" />
+                <el-option label="启用" value="1" />
+                <el-option label="禁用" value="0" />
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div class="search-right">
           <el-button type="primary" @click="handleSearch" :loading="loading">
             <el-icon><Search /></el-icon>
             搜索
@@ -35,15 +31,15 @@
             <el-icon><Refresh /></el-icon>
             重置
           </el-button>
-        </el-form-item>
-      </el-form>
+        </div>
+      </div>
     </el-card>
 
     <!-- 操作区域 -->
     <el-card class="operation-card">
       <div class="operation-header">
         <h3>员工列表</h3>
-        <el-button type="primary" @click="handleAdd">
+        <el-button type="primary" @click="handleAdd" class="add-btn">
           <el-icon><Plus /></el-icon>
           新增员工
         </el-button>
@@ -59,41 +55,28 @@
         style="width: 100%"
         empty-text="暂无数据"
       >
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column prop="username" label="用户名" width="120" />
-        <el-table-column prop="realName" label="真实姓名" width="120" />
-        <el-table-column prop="phone" label="手机号" width="130" />
-        <el-table-column prop="email" label="邮箱" width="180" />
-        <el-table-column prop="sex" label="性别" width="80">
-          <template #default="{ row }">
-            <el-tag :type="row.sex === 1 ? 'primary' : 'success'">
-              {{ row.sex === 1 ? '男' : '女' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="age" label="年龄" width="80" />
-        <el-table-column prop="status" label="状态" width="100">
+        <el-table-column prop="realName" label="员工姓名" min-width="120" />
+        <el-table-column prop="username" label="账号" min-width="100" />
+        <el-table-column prop="phone" label="手机号" min-width="130" />
+        <el-table-column prop="status" label="账号状态" min-width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'">
               {{ row.status === 1 ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="180" />
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column prop="updateTime" label="最后操作时间" min-width="160">
+          <template #default="{ row }">
+            {{ row.updateTime || '暂无记录' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="150" fixed="right" align="center">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleEdit(row)">
-              编辑
-            </el-button>
-            <el-button
-              :type="row.status === 1 ? 'warning' : 'success'"
-              size="small"
-              @click="handleToggleStatus(row)"
-            >
-              {{ row.status === 1 ? '禁用' : '启用' }}
+              修改
             </el-button>
             <el-button type="danger" size="small" @click="handleDelete(row)">
-              删除
+              禁用
             </el-button>
           </template>
         </el-table-column>
@@ -120,6 +103,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
+import { getAdminPage } from '@/api/user'
 
 const router = useRouter()
 
@@ -128,8 +112,7 @@ const loading = ref(false)
 
 // 搜索表单
 const searchForm = reactive({
-  realName: '',
-  username: '',
+  name: '',
   status: ''
 })
 
@@ -140,47 +123,45 @@ const pagination = reactive({
   total: 0
 })
 
-// Admin列表（模拟数据）
-const adminList = ref([
-  {
-    id: 1,
-    username: 'admin',
-    realName: '超级管理员',
-    phone: '13888888888',
-    email: 'admin@example.com',
-    sex: 1,
-    age: 30,
-    status: 1,
-    createTime: '2023-05-01 10:00:00'
-  },
-  {
-    id: 2,
-    username: 'admin2',
-    realName: '管理员二',
-    phone: '13999999999',
-    email: 'admin2@example.com',
-    sex: 0,
-    age: 25,
-    status: 1,
-    createTime: '2023-05-02 10:00:00'
+// 员工列表
+const adminList = ref([])
+
+// 获取员工列表
+const getAdminList = async () => {
+  loading.value = true
+  try {
+    const params = {
+      page: pagination.page,
+      pageSize: pagination.pageSize,
+      name: searchForm.name || undefined,
+      status: searchForm.status || undefined
+    }
+
+    const response = await getAdminPage(params)
+    if (response.code === 1) {
+      adminList.value = response.data.records
+      pagination.total = response.data.total
+    } else {
+      ElMessage.error(response.msg || '获取员工列表失败')
+    }
+  } catch (error) {
+    console.error('获取员工列表失败:', error)
+    ElMessage.error('获取员工列表失败')
+  } finally {
+    loading.value = false
   }
-])
+}
 
 // 搜索
 const handleSearch = () => {
-  loading.value = true
-  // TODO: 调用后端搜索接口
-  setTimeout(() => {
-    loading.value = false
-    ElMessage.info('搜索功能待后端接口完善后实现')
-  }, 1000)
+  pagination.page = 1 // 重置到第一页
+  getAdminList()
 }
 
 // 重置搜索
 const handleReset = () => {
   Object.assign(searchForm, {
-    realName: '',
-    username: '',
+    name: '',
     status: ''
   })
   handleSearch()
@@ -218,18 +199,19 @@ const handleDelete = async (row) => {
 // 分页大小改变
 const handleSizeChange = (size) => {
   pagination.pageSize = size
-  handleSearch()
+  pagination.page = 1 // 重置到第一页
+  getAdminList()
 }
 
 // 当前页改变
 const handleCurrentChange = (page) => {
   pagination.page = page
-  handleSearch()
+  getAdminList()
 }
 
 // 页面加载
 onMounted(() => {
-  handleSearch()
+  getAdminList()
 })
 </script>
 
@@ -242,6 +224,23 @@ onMounted(() => {
 .operation-card,
 .table-card {
   margin-bottom: 20px;
+}
+
+/* 搜索区域布局 */
+.search-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.search-left {
+  flex: 1;
+}
+
+.search-right {
+  display: flex;
+  gap: 10px;
 }
 
 .search-form {
@@ -263,5 +262,36 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+/* 新增员工按钮动画 */
+.add-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
+}
+
+.add-btn:active {
+  transform: translateY(0);
+}
+
+.add-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.add-btn:hover::before {
+  left: 100%;
 }
 </style>
