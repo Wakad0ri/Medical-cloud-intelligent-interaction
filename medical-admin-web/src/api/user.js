@@ -17,6 +17,15 @@ export const logout = () => {
   })
 }
 
+// 添加管理员
+export const addAdmin = (data) => {
+  return request({
+    url: '/admin/add',
+    method: 'post',
+    data
+  })
+}
+
 // 启用/禁用用户
 export const toggleUserStatus = (id, status) => {
   return request({

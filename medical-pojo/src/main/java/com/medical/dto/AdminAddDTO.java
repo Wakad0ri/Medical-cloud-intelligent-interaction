@@ -14,6 +14,30 @@ import java.io.Serializable;
 @Schema(description = "管理员新增请求")
 public class AdminAddDTO implements Serializable {
 
-    @Schema()
+    @Schema(description = "用户名")
     private String username;
+
+    @Schema(description = "密码")
+    private String password;
+
+    @Schema(description = "姓名")
+    private String realName;
+
+    @Schema(description = "手机号")
+    private String phone;
+
+    @Schema(description = "身份证号")
+    private String idCard;
+
+    @Schema(description = "邮箱")
+    private String email;
+
+    @Schema(description = "性别")
+    private String sex;
+
+    @Schema(description = "年龄")
+    private Integer age;
+
+    @Schema(description = "头像")
+    private String avatar;
 }

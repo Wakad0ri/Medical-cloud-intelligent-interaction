@@ -1,6 +1,5 @@
 package com.medical.controller.admin;
 
-import com.medical.context.BaseContext;
 import com.medical.dto.AdminAddDTO;
 import com.medical.properties.JwtProperties;
 import com.medical.utils.JwtUtil;
@@ -17,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+
+// @Autowired       是 Spring IoC 的注解
+// @RequestMapping  是 Spring MVC 的注解
+// @RestController  是 Spring MVC 的注解
+// @RequestBody     是 Spring MVC 的注解
 
 /**
  * 管理端-管理员 Controller 类
@@ -80,7 +84,11 @@ public class AdminController {
 
     @PostMapping("/add")
     @Operation(summary = "添加管理员")
-    public Result<String> add(@RequestBody AdminAddDTO adminAddDTO)
+    public Result<String> add(@RequestBody AdminAddDTO adminAddDTO){
+        log.info("添加管理员：{}", adminAddDTO);
+        adminService.add(adminAddDTO);
+        return Result.success();
+    }
 
 
 

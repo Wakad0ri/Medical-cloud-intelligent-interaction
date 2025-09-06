@@ -42,6 +42,10 @@
               <el-icon><Avatar /></el-icon>
               <span>医生管理</span>
             </el-menu-item>
+            <el-menu-item index="/admin/employees">
+              <el-icon><UserFilled /></el-icon>
+              <span>员工管理</span>
+            </el-menu-item>
             <el-menu-item index="/admin/departments">
               <el-icon><OfficeBuilding /></el-icon>
               <span>科室管理</span>
@@ -76,6 +80,7 @@ import {
   ArrowDown,
   House,
   Avatar,
+  UserFilled,
   OfficeBuilding,
   Calendar,
   DataAnalysis
