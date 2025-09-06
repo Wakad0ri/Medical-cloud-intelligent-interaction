@@ -1,4 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 专题一：SpringAOP相关知识 -->
+<!--
+    专题一：SpringAOP相关知识
+
+    一、如何专门指定拦截的类/方法？
+        答：通过自定义注解的方式
+        （给需要拦截的方法打上标记，用MethodSignature来接收，然后把标记.get转变为AutoFill）
+        - 首先，创建一个自定义注解类(class -> @interface)，加上注解：
+            · @Target(ElementType.METHOD)           表示该注解作用在方法上
+            · @Retention(RetentionPolicy.RUNTIME)   表示该注解在运行时生效
+
+        - 然后，在注解类中加上固定方法：OperationType value()   表示该注解有一个属性value，类型为OperationType
+          并在注解类中定义一个枚举类OperationType，表示该注解的value属性的值只能是枚举类中的值
+
+        - 之后，在声明@Pointcut("execution(...) 时，后续还要加上注解的全类名：
+          &&  @annotation(com.medical.annotation.AutoFill)")
+
+        - 最后，在需要拦截的方法上加上该注解：@AutoFill(OperationType.INSERT)
+
+    二、如何通过SpringAOP获取方法参数？
+        答：用MethodSignature来接收标记 ->
+        然后把标记.getMethod().getAnnotations(AutoFill.class)转变为AutoFill
+-->
+
+<!-- 专题二：关于给前端VO为什么要id的问题 -->
+<!--
+    专题二：关于给前端VO为什么要id的问题
+
+    Q：为什么给前端VO对象要id属性？
+    A：因为前端需要根据后端传过来的VO中id来删除数据，所以要给前端VO对象要id属性
+-->
+
+<!-- 专题三：传给前端的日期格式如何转换 -->
+<!--
+    专题三：传给前端的日期格式如何转换
+    Q: 后端传给前端的日期会变成 2025,7,19,21,42,6（接口文档），202571921426（前后端联调）的格式
+       需要怎么转换？
+    A: 所以需要对
+        · 方式一: 属性进行@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")注解，只针对单个注解
+        · 方式二: 全局统一日期格式，在WebMvcConfiguration.java 中添加 SpringMVC 的 消息转换器
+                 统一对日期进行格式化处理
+        @Override
+        protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+            MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+            converter.setObjectMapper(new JacksonObjectMapper());
+            定义时间格式，注册时间序列化器（见WebMvcConfiguration.java）
+            objectMapper.registerModule(javaTimeModule);
+            converter.setObjectMapper(objectMapper);
+            converters.add(0, converter);
+        }
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0

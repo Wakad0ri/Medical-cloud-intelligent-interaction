@@ -35,11 +35,32 @@ export const getAdminPage = (params) => {
   })
 }
 
-// 启用/禁用用户
-export const toggleUserStatus = (id, status) => {
+// 启用/禁用管理员账号
+export const updateAdminStatus = (id, status) => {
+  console.log('API调用参数:', { id, status })
   return request({
-    url: `/admin/user/status/${id}`,
+    url: `/admin/status/${status}?id=${id}`,
+    method: 'put'
+  })
+}
+
+// 修改管理员信息
+export const updateAdmin = (data) => {
+  return request({
+    url: '/admin/update',
     method: 'put',
-    data: { status }
+    data
+  })
+}
+
+// 修改管理员密码
+export const updateAdminPassword = (password, newPassword) => {
+  return request({
+    url: '/admin/password',
+    method: 'put',
+    params: {
+      password,
+      newPassword
+    }
   })
 }

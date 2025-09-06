@@ -1,7 +1,10 @@
 package com.medical.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.ibatis.type.Alias;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -12,6 +15,9 @@ import java.time.LocalDateTime;
  * 管理员信息实体类
  */
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Admin implements Serializable {
 
     @Schema(description = "用户ID")

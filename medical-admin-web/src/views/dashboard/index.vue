@@ -96,7 +96,7 @@
               <el-icon><Avatar /></el-icon>
               医生管理
             </el-button>
-            <el-button type="danger" @click="$router.push('/admin/employees')">
+            <el-button type="danger" @click="$router.push('/admin/page')">
               <el-icon><UserFilled /></el-icon>
               员工管理
             </el-button>

@@ -15,7 +15,8 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item command="changePassword">修改密码</el-dropdown-item>
+                <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -42,7 +43,7 @@
               <el-icon><Avatar /></el-icon>
               <span>医生管理</span>
             </el-menu-item>
-            <el-menu-item index="/admin/employees">
+            <el-menu-item index="/admin/page">
               <el-icon><UserFilled /></el-icon>
               <span>员工管理</span>
             </el-menu-item>
@@ -67,14 +68,63 @@
         </el-main>
       </el-container>
     </el-container>
+
+    <!-- 修改密码对话框 -->
+    <el-dialog
+      v-model="passwordDialogVisible"
+      title="修改密码"
+      width="400px"
+      :close-on-click-modal="false"
+    >
+      <el-form
+        ref="passwordFormRef"
+        :model="passwordForm"
+        :rules="passwordRules"
+        label-width="100px"
+      >
+        <el-form-item label="旧密码" prop="oldPassword">
+          <el-input
+            v-model="passwordForm.oldPassword"
+            type="password"
+            placeholder="请输入当前密码"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item label="新密码" prop="newPassword">
+          <el-input
+            v-model="passwordForm.newPassword"
+            type="password"
+            placeholder="请输入新密码"
+            show-password
+          />
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input
+            v-model="passwordForm.confirmPassword"
+            type="password"
+            placeholder="请再次输入新密码"
+            show-password
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="passwordDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handlePasswordSubmit" :loading="passwordLoading">
+            确定
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAdminStore } from '@/stores/admin'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { updateAdminPassword } from '@/api/user'
 import {
   User,
   ArrowDown,
@@ -89,6 +139,42 @@ import {
 const router = useRouter()
 const route = useRoute()
 const adminStore = useAdminStore()
+
+// 密码修改相关
+const passwordDialogVisible = ref(false)
+const passwordFormRef = ref()
+const passwordLoading = ref(false)
+
+// 密码表单数据
+const passwordForm = reactive({
+  oldPassword: '',
+  newPassword: '',
+  confirmPassword: ''
+})
+
+// 密码验证规则
+const passwordRules = {
+  oldPassword: [
+    { required: true, message: '请输入当前密码', trigger: 'blur' }
+  ],
+  newPassword: [
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+  ],
+  confirmPassword: [
+    { required: true, message: '请再次输入新密码', trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        if (value !== passwordForm.newPassword) {
+          callback(new Error('两次输入的密码不一致'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
+  ]
+}
 
 const activeMenu = computed(() => route.path)
 
@@ -115,6 +201,53 @@ const handleCommand = async (command) => {
         ElMessage.error('退出失败')
       }
     }
+  } else if (command === 'changePassword') {
+    // 打开修改密码对话框
+    passwordDialogVisible.value = true
+    // 重置表单
+    passwordForm.oldPassword = ''
+    passwordForm.newPassword = ''
+    passwordForm.confirmPassword = ''
+  }
+}
+
+// 提交密码修改
+const handlePasswordSubmit = async () => {
+  try {
+    // 表单验证
+    await passwordFormRef.value.validate()
+
+    passwordLoading.value = true
+
+    // 调用修改密码接口
+    const response = await updateAdminPassword(passwordForm.oldPassword, passwordForm.newPassword)
+
+    if (response.code === 1) {
+      ElMessage.success('修改密码成功')
+      passwordDialogVisible.value = false
+      // 重置表单
+      passwordForm.oldPassword = ''
+      passwordForm.newPassword = ''
+      passwordForm.confirmPassword = ''
+    } else {
+      ElMessage.error(response.msg || '修改密码失败')
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('修改密码失败:', error)
+      // 检查是否是后端返回的业务异常
+      if (error.msg) {
+        // 后端业务异常，直接显示错误信息
+        ElMessage.error(error.msg)
+      } else if (error.response && error.response.data && error.response.data.msg) {
+        // HTTP错误响应
+        ElMessage.error(error.response.data.msg)
+      } else {
+        ElMessage.error('修改密码失败')
+      }
+    }
+  } finally {
+    passwordLoading.value = false
   }
 }
 </script>

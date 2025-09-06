@@ -8,6 +8,7 @@ com\medical\config\OpenApiConfig.class
 com\medical\annotation\AutoFill.class
 com\medical\annotation\AutoFill$OperationType.class
 com\medical\interceptor\JwtTokenUserInterceptor.class
+com\medical\handler\GlobalExceptionHandler.class
 com\medical\interceptor\JwtTokenDoctorInterceptor.class
 com\medical\config\WebMvcConfiguration.class
 com\medical\controller\TestController.class

@@ -33,9 +33,9 @@ request.interceptors.response.use(
     if (res.code === 1) {
       return res
     } else {
-      // 其他状态码都当作错误处理
-      ElMessage.error(res.msg || '请求失败')
-      return Promise.reject(new Error(res.msg || '请求失败'))
+      // 其他状态码都当作错误处理，但不在这里显示错误信息
+      // 让具体的业务代码来处理错误显示
+      return Promise.reject(res)
     }
   },
   error => {

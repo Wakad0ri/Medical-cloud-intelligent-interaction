@@ -41,7 +41,7 @@ const routes = [
         meta: { title: '管理员首页', requiresAuth: true }
       },
       {
-        path: 'employees',
+        path: 'page',
         name: 'EmployeeManagement',
         component: () => import('@/views/admin/list.vue'),
         meta: { title: '员工管理', requiresAuth: true }
@@ -51,6 +51,12 @@ const routes = [
         name: 'AdminAdd',
         component: () => import('@/views/admin/add.vue'),
         meta: { title: '新增员工', requiresAuth: true }
+      },
+      {
+        path: 'edit',
+        name: 'EditEmployee',
+        component: () => import('@/views/admin/edit.vue'),
+        meta: { title: '修改员工', requiresAuth: true }
       }
     ]
   }
