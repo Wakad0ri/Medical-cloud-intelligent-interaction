@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Select;
 public interface AdminMapper {
 
     /**
-     * 根据用户名查询用户
+     * 根据用户名查询用户（用户登录需要！！！）
      * @param username 用户名
      * @return 用户
      */
@@ -34,4 +34,19 @@ public interface AdminMapper {
      * @return 用户列表
      */
     Page<Admin> page(AdminPageQueryDTO adminPageQueryDTO);
+
+    /**
+     * 修改用户, 包括启用禁用
+     * @param admin 用户
+     */
+    @AutoFill(AutoFill.OperationType.UPDATE)
+    void update(Admin admin);
+
+    /**
+     * 根据ID查询用户
+     * @param id 用户ID
+     * @return 用户
+     */
+    @Select("select * from admin where id = #{id}")
+    Admin getById(Long id);
 }

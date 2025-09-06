@@ -14,4 +14,10 @@ public interface AdminService {
     void add(AdminAddDTO adminAddDTO);
 
     PageResult page(AdminPageQueryDTO adminPageQueryDTO);
+
+    void startOrStop(Integer status, Long id);
+
+    void update(AdminAddDTO adminLoginDTO);
+
+    void password(String password, String newPassword);
 }

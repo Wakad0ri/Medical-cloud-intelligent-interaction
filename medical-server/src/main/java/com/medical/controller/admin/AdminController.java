@@ -100,6 +100,30 @@ public class AdminController {
         return Result.success(pageResult);
     }
 
+    @PutMapping("/status/{status}")
+    @Operation(summary = "启用禁用管理员")
+    public Result<String> startOrStop(@PathVariable("status") Integer status, @RequestParam("id") Long id){
+        log.info("启用禁用管理员：{}", id);
+        adminService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    @PutMapping("/update")
+    @Operation(summary = "修改管理员信息")
+    public Result<String> update(@RequestBody AdminAddDTO adminAddDTO){
+        log.info("修改管理员信息：{}", adminAddDTO);
+        adminService.update(adminAddDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/password")
+    @Operation(summary = "修改管理员密码")
+    public Result<String> updatePassword(@RequestParam("password") String password, @RequestParam("newPassword") String newPassword){
+        log.info("修改当前管理员密码");
+        adminService.password(password, newPassword);
+        return Result.success();
+    }
+
 
 
 

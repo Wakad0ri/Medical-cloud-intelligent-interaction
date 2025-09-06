@@ -75,8 +75,13 @@
             <el-button type="primary" size="small" @click="handleEdit(row)">
               修改
             </el-button>
-            <el-button type="danger" size="small" @click="handleDelete(row)">
-              禁用
+            <el-button
+              :type="row.status === 1 ? 'warning' : 'success'"
+              size="small"
+              @click="handleToggleStatus(row)"
+              :loading="row.statusLoading"
+            >
+              {{ row.status === 1 ? '禁用' : '启用' }}
             </el-button>
           </template>
         </el-table-column>
@@ -103,7 +108,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-import { getAdminPage } from '@/api/user'
+import { getAdminPage, updateAdminStatus } from '@/api/user'
 
 const router = useRouter()
 
@@ -139,7 +144,12 @@ const getAdminList = async () => {
 
     const response = await getAdminPage(params)
     if (response.code === 1) {
-      adminList.value = response.data.records
+      // 为每个员工添加statusLoading状态
+      console.log('后端返回的数据:', response.data.records)
+      adminList.value = response.data.records.map(admin => ({
+        ...admin,
+        statusLoading: false
+      }))
       pagination.total = response.data.total
     } else {
       ElMessage.error(response.msg || '获取员工列表失败')
@@ -174,27 +184,70 @@ const handleAdd = () => {
 
 // 编辑员工
 const handleEdit = (row) => {
-  ElMessage.info(`编辑员工功能待后端接口完善后实现，员工 ID: ${row.id}`)
+  // 将员工信息作为查询参数传递到编辑页面
+  const adminData = encodeURIComponent(JSON.stringify(row))
+  router.push(`/admin/edit?admin=${adminData}`)
 }
 
 // 切换状态
-const handleToggleStatus = (row) => {
-  ElMessage.info(`切换状态功能待后端接口完善后实现，员工 ID: ${row.id}`)
-}
+const handleToggleStatus = async (row) => {
+  console.log('点击的行数据:', row)
+  console.log('row.id:', row.id, 'typeof:', typeof row.id)
 
-// 删除员工
-const handleDelete = async (row) => {
+  const newStatus = row.status === 1 ? 0 : 1
+  const statusText = newStatus === 1 ? '启用' : '禁用'
+
   try {
-    await ElMessageBox.confirm(`确定要删除员工"${row.realName}"吗？`, '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    })
-    ElMessage.info(`删除员工功能待后端接口完善后实现，员工 ID: ${row.id}`)
+    await ElMessageBox.confirm(
+      `确定要${statusText}员工"${row.realName}"的账号吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    // 设置按钮加载状态
+    row.statusLoading = true
+
+    console.log('调用状态更新接口:', { id: row.id, status: newStatus, idType: typeof row.id, statusType: typeof newStatus })
+    const response = await updateAdminStatus(row.id, newStatus)
+    console.log('后端响应:', response)
+    if (response.code === 1) {
+      // 更新本地状态
+      row.status = newStatus
+      ElMessage.success(`${statusText}成功`)
+    } else {
+      ElMessage.error(response.msg || `${statusText}失败`)
+    }
   } catch (error) {
-    // 用户取消删除
+    if (error !== 'cancel') {
+      console.error('状态切换失败:', error)
+      // 检查是否是后端返回的业务异常
+      if (error.msg) {
+        // 后端业务异常
+        ElMessage.error(`${statusText}失败，${error.msg}`)
+      } else if (error.response && error.response.data) {
+        // HTTP错误
+        if (error.response.data.msg) {
+          ElMessage.error(`${statusText}失败，${error.response.data.msg}`)
+        } else if (error.response.data.message) {
+          ElMessage.error(`${statusText}失败，${error.response.data.message}`)
+        } else {
+          ElMessage.error(`${statusText}失败`)
+        }
+      } else {
+        ElMessage.error(`${statusText}失败`)
+      }
+    }
+  } finally {
+    // 清除按钮加载状态
+    row.statusLoading = false
   }
 }
+
+
 
 // 分页大小改变
 const handleSizeChange = (size) => {

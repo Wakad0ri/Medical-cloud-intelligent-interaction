@@ -1,27 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 专题一：SpringAOP相关知识 -->
-<!--
-    专题一：SpringAOP相关知识
 
-    一、如何专门指定拦截的类/方法？
-        答：通过自定义注解的方式
-        （给需要拦截的方法打上标记，用MethodSignature来接收，然后把标记.get转变为AutoFill）
-        - 首先，创建一个自定义注解类(class -> @interface)，加上注解：
-            · @Target(ElementType.METHOD)           表示该注解作用在方法上
-            · @Retention(RetentionPolicy.RUNTIME)   表示该注解在运行时生效
-
-        - 然后，在注解类中加上固定方法：OperationType value()   表示该注解有一个属性value，类型为OperationType
-          并在注解类中定义一个枚举类OperationType，表示该注解的value属性的值只能是枚举类中的值
-
-        - 之后，在声明@Pointcut("execution(...) 时，后续还要加上注解的全类名：
-          &&  @annotation(com.medical.annotation.AutoFill)")
-
-        - 最后，在需要拦截的方法上加上该注解：@AutoFill(OperationType.INSERT)
-
-    二、如何通过SpringAOP获取方法参数？
-        答：用MethodSignature来接收标记 ->
-        然后把标记.getMethod().getAnnotations(AutoFill.class)转变为AutoFill
--->
 
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"

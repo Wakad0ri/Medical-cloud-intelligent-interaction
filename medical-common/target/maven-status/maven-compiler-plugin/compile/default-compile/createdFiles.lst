@@ -1,6 +1,7 @@
 com\medical\utils\JwtUtil.class
 com\medical\exception\UsernameNotFoundException.class
 com\medical\exception\BaseException.class
+com\medical\result\PageResult.class
 com\medical\exception\UserTypeErrorException.class
 com\medical\constant\AutoFillConstant.class
 com\medical\context\BaseContext.class

@@ -2,6 +2,7 @@ package com.medical.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.medical.context.BaseContext;
 import com.medical.dto.AdminAddDTO;
 import com.medical.dto.AdminLoginDTO;
 import com.medical.dto.AdminPageQueryDTO;
@@ -12,7 +13,6 @@ import com.medical.exception.UsernameNotFoundException;
 import com.medical.mapper.AdminMapper;
 import com.medical.result.PageResult;
 import com.medical.service.AdminService;
-import com.medical.vo.AdminPageQueryVO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -20,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service // SpringIOC注解
 @Tag(name = "管理端-管理员服务接口")
@@ -88,25 +86,61 @@ public class AdminServiceImpl implements AdminService {
     public PageResult page(AdminPageQueryDTO adminPageQueryDTO) {
         PageHelper.startPage(adminPageQueryDTO.getPage(), adminPageQueryDTO.getPageSize());
         Page<Admin> page = adminMapper.page(adminPageQueryDTO);
+        // TODO：处理时间格式处理
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        List<AdminPageQueryVO> list = page.getResult().stream().map(admin -> {
-            AdminPageQueryVO adminPageQueryVO = new AdminPageQueryVO();
-            BeanUtils.copyProperties(admin, adminPageQueryVO);
+        return new PageResult(page.getTotal(), page.getResult());
+    }
 
-            // 手动处理时间格式转换
-            if (admin.getUpdateTime() != null) {
-                adminPageQueryVO.setUpdateTime(admin.getUpdateTime().format(formatter));
-            } else if (admin.getCreateTime() != null) {
-                // 如果updateTime为空，使用createTime
-                adminPageQueryVO.setUpdateTime(admin.getCreateTime().format(formatter));
-            }
+    /**
+     * 启用禁用管理员
+     * @param status 状态
+     * @param id 管理员ID
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Long nowId = BaseContext.getCurrentId();
+        if (Objects.equals(id, nowId)){
+            throw new AdminStatusErrorException("不能禁用自己");
+        }
+        Admin admin = Admin.builder()
+                .id(id)
+                .status(status)
+                .build();
+        adminMapper.update(admin);
+    }
 
-            return adminPageQueryVO;
-        }).toList();
-        return new PageResult(page.getTotal(), list);
+    /**
+     * 修改管理员信息
+     * @param adminLoginDTO 管理员信息
+     */
+    @Override
+    public void update(AdminAddDTO adminLoginDTO) {
+        Admin adminDB = adminMapper.getAdminByUsername(adminLoginDTO.getUsername());
+        if(adminDB.getStatus() == 1){
+            throw new AdminStatusErrorException("只有在禁用的情况下才能修改！");
+        }
+        Admin admin = new Admin();
+        BeanUtils.copyProperties(adminLoginDTO, admin);
+        adminMapper.update(admin);
+    }
 
+    /**
+     * 修改管理员密码
+     * @param password 旧密码
+     * @param newPassword 新密码
+     */
+    @Override
+    public void password(String password, String newPassword){
+        Long id = BaseContext.getCurrentId();
+        Admin admin = adminMapper.getById(id);
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
+        if(!password.equals(admin.getPassword())){
+            throw new PasswordErrorException("旧密码错误！");
+        }
+        newPassword = DigestUtils.md5DigestAsHex(newPassword.getBytes());
+        admin.setPassword(newPassword);
+        adminMapper.update(admin);
     }
 
 }

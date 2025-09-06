@@ -17,4 +17,49 @@
         </where>
         order by update_time desc
     </select>
+
+    <update id="update">
+        update admin
+        <set>
+            <if test="username != null">
+                username = #{username},
+            </if>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="realName != null">
+                real_name = #{realName},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="idCard != null">
+                id_card = #{idCard},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="avatar != null">
+                avatar = #{avatar},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="updateAdmin != null">
+                update_admin = #{updateAdmin},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
 </mapper>
