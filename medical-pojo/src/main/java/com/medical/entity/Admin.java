@@ -2,6 +2,7 @@ package com.medical.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.apache.ibatis.type.Alias;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;

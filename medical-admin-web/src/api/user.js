@@ -26,6 +26,15 @@ export const addAdmin = (data) => {
   })
 }
 
+// 分页查询管理员
+export const getAdminPage = (params) => {
+  return request({
+    url: '/admin/page',
+    method: 'get',
+    params
+  })
+}
+
 // 启用/禁用用户
 export const toggleUserStatus = (id, status) => {
   return request({
