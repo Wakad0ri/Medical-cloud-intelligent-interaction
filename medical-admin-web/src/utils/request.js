@@ -3,6 +3,9 @@ import { ElMessage } from 'element-plus'
 import { useAdminStore } from '@/stores/admin'
 import router from '@/router'
 
+// 防重复提示标志
+let isLogoutProcessing = false
+
 // 创建axios实例
 const request = axios.create({
   baseURL: '/api',
@@ -46,10 +49,18 @@ request.interceptors.response.use(
 
       switch (status) {
         case 401:
-          ElMessage.error('登录已过期，请重新登录')
-          const adminStore = useAdminStore()
-          adminStore.adminLogout()
-          router.push('/login')
+          // 防止重复提示和重复跳转
+          if (!isLogoutProcessing) {
+            isLogoutProcessing = true
+            ElMessage.error('登录已过期，请重新登录')
+            const adminStore = useAdminStore()
+            adminStore.adminLogout()
+            router.push('/login')
+            // 2秒后重置标志，防止用户重新登录后无法正常提示
+            setTimeout(() => {
+              isLogoutProcessing = false
+            }, 2000)
+          }
           break
         case 403:
           ElMessage.error('没有权限访问')

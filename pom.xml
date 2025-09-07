@@ -1,4 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Tip：
+    只需要在配置属性类才需要@Component
+    对应的，只有在有@Component, Service, Controller ...
+    才需要加 @Bean
+-->
+
+
+<!-- 专题一：《Swagger.v3-接口文档》相关学习 -->
+<!--
+    专题一：《Swagger.v3-接口文档》相关学习
+
+    一、什么是Swagger.v3？
+        Swagger-v3 是一个API文档生成和测试工具
+        1. 作用：
+            - 自动生成API文档     - 提供在线API测试界面    - 标准化API接口定义
+    二、常用方法：
+        - OpenAPI.info() -> 全局API配置    |   .
+        - Info.title()   -> API标题       |   .description() -> API描述       |  .version() -> API版本
+              .contact() -> 配置联系人信息  |
+        - Contact.name() -> 联系人姓名     |   .email() -> 联系人邮箱            |  .url() ：联系人网址
+
+        - GroupedOpenApi 表示 分组API配置，需要定义属性 group(分组组名), pathsToMatch(路径匹配), packagesToScan(Controller包扫描)
+          比如.group("admin").pathsToMatch("/admin/**").packagesToScan("com.medical.controller.admin")
+    三、如何使用Swagger.v3
+            - 导入依赖：
+                · knife4j-openapi3-jakarta-spring-boot-starter
+            - 先创建一个Configuration类, 加上注解@Configuration
+            - 在该类生成一个返回对象为OpenAPI全局API配置的方法
+            - 声明子分组API配置方法
+-->
+
 <!-- 专题一：SpringAOP相关知识 -->
 <!--
     专题一：SpringAOP相关知识
@@ -13,14 +45,39 @@
         - 然后，在注解类中加上固定方法：OperationType value()   表示该注解有一个属性value，类型为OperationType
           并在注解类中定义一个枚举类OperationType，表示该注解的value属性的值只能是枚举类中的值
 
+        - 而后，创建接口处理类 AutoFillAspect.java 加上注解@Aspect
+
         - 之后，在声明@Pointcut("execution(...) 时，后续还要加上注解的全类名：
           &&  @annotation(com.medical.annotation.AutoFill)")
 
         - 最后，在需要拦截的方法上加上该注解：@AutoFill(OperationType.INSERT)
 
     二、如何通过SpringAOP获取方法参数？
-        答：用MethodSignature来接收标记 ->
-        然后把标记.getMethod().getAnnotations(AutoFill.class)转变为AutoFill
+        答：用joinPoint.getSignature()来接收MethodSignature标记 ->
+        然后把 标记.getMethod().getAnnotations(AutoFill.class) 转变为AutoFill
+
+    三、AOP相关的API：
+        1）对象是JoinPoint的话：
+            - .getSignature()  -> 获取方法签名         - .getArgs()     -> 获取方法参数
+            - .getTarget()     -> 获取目标对象
+        2）对象是 SignatureMethod 的话：（处于JoinPoint和Method之间的一个类）
+            - .getMethod()     -> 获取Method
+            - .getDeclaringType()  -> 获取声明该方法的类型（加上Name就是获取类名）
+            - .getExceptionTypes() -> 获取方法抛出的异常类型
+        3）对象是 Method 的话：
+            - .getArgs() -> 获取方法参数
+            - .getAnnotation( 注解类名.class ) -> 获取指定类型的注解
+            - .getAnnotations() -> 获取所有注解
+            - .isAnnotationPresent(Class) -> 判断是否有指定注解
+            - .invoke(A, B) -> 调用方法, 将B中的参数映射到A中
+            - 和上SignatureMethod一样：
+                .getName() -> 获取方法名     .getReturnType() -> 获取方法返回值类
+                .getModifiers() -> 获取方法修饰符
+        4）对象是xxx.getClass()
+            - getDeclaredMethod("方法名", 方法返回值类型.class) -> 获取指定方法，后可以通过.invoke()调用方法
+
+    Tip：什么是目标对象？
+    答：就是被拦截的方法所属的类的对象（比如add -> AdminServiceImpl -> adminServiceImpl）
 -->
 
 <!-- 专题二：关于给前端VO为什么要id的问题 -->
@@ -31,12 +88,13 @@
     A：因为前端需要根据后端传过来的VO中id来删除数据，所以要给前端VO对象要id属性
 -->
 
-<!-- 专题三：传给前端的日期格式如何转换 -->
+<!-- 专题三：关于Configuration相关 -->
 <!--
-    专题三：传给前端的日期格式如何转换
-    Q: 后端传给前端的日期会变成 2025,7,19,21,42,6（接口文档），202571921426（前后端联调）的格式
+    专题三：关于WebMvcConfiguration.java相关
+
+    一、后端传给前端的日期会变成 2025,7,19,21,42,6（接口文档），202571921426（前后端联调）的格式
        需要怎么转换？
-    A: 所以需要对
+    答: 所以需要对
         · 方式一: 属性进行@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")注解，只针对单个注解
         · 方式二: 全局统一日期格式，在WebMvcConfiguration.java 中添加 SpringMVC 的 消息转换器
                  统一对日期进行格式化处理
@@ -47,8 +105,33 @@
             定义时间格式，注册时间序列化器（见WebMvcConfiguration.java）
             objectMapper.registerModule(javaTimeModule);
             converter.setObjectMapper(objectMapper);
-            converters.add(0, converter);
+            converters.add(0, converter);   // 0这里表示优先级，越小越优先，我们不能直接填0，需要找到合适的位置
         }
+
+    二、文件上传怎么进行？
+    答:
+        1）在此之前导入依赖：aliyun-sdk-oss
+        2）创建一个 properties/AliOssProperties 用来 从yml获取并存放配置阿里云的OSS 的属性
+            注解：@ConfigurationProperties(prefix = "medical.oss")表示获取yml中的属性并存放
+            endpoint, accessKeyId, accessKeySecret, bucketName
+        3）创建一个核心工具类：AliOssUtil，不用@Component
+            属性设置：endpoint、accessKeyId、accessKeySecret, bucketName
+            - 创建方法： byte指的是"要上传的文件字节数组"，fileName是"文件名"，不需要@Bean
+                upload(byte[] bytes, String fileName){}
+            - 创建一个ossClient客户端：
+                OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+            - try 一个 ossClient.putObject 上传文件请求，最后finally里要关闭ossClient
+                ossClient.putObject(bucketName, fileName, new ByteArrayInputStream(bytes))
+                ... -> ossClient.shutdown();
+            - 构建访问URL
+                StringBuilder url = new StringBuilder("http://");
+                url.append(bucketName).append(".").append(endpoint.replace("https://", ""))
+                .append("/").append(fileName);
+                return url.toString();
+        4）编写配置类：OSSConfiguration，创建方法
+            public AliOssUtil aliOssUtil(AliOssProperties aliOssProperties){
+                return new AliOssUtil(aliOssProperties.四个get);
+            }
 -->
 
 <!-- 专题四：关于MyBatis -->
@@ -103,6 +186,7 @@
         <jaxb-api.version>4.0.1</jaxb-api.version>
         <poi.version>5.2.5</poi.version>
         <springdoc.version>2.2.0</springdoc.version>
+        <aliyun.sdk.oss>3.17.4</aliyun.sdk.oss>
     </properties>
 
     <dependencyManagement>
@@ -212,13 +296,6 @@
                 <version>${knife4j.version}</version>
             </dependency>
 
-            <!-- SpringDoc OpenAPI -->
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-                <version>${springdoc.version}</version>
-            </dependency>
-
             <!-- Spring Boot AOP Starter -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -231,6 +308,13 @@
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
                 <version>${aspectj.version}</version>
+            </dependency>
+
+            <!-- 阿里云OSS -->
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun.sdk.oss}</version>
             </dependency>
         </dependencies>
 

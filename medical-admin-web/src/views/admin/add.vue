@@ -106,11 +106,7 @@
         </el-row>
 
         <el-form-item label="头像" prop="avatar">
-          <el-input
-            v-model="adminForm.avatar"
-            placeholder="请输入头像URL（可选）"
-            clearable
-          />
+          <ImageUpload v-model="adminForm.avatar" />
         </el-form-item>
 
         <el-form-item>
@@ -131,6 +127,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { addAdmin } from '@/api/user'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 const router = useRouter()
 

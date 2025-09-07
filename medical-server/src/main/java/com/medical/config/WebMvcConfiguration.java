@@ -90,6 +90,17 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         converter.setObjectMapper(objectMapper);
 
         // 将消息转换器对象追加到mvc框架的转换器集合中（index设置为0，表示设置在第一个位置，避免被其它转换器接收，从而达不到想要的功能）
+        for (int i = 0; i < converters.size(); i++) {
+            if (converters.get(i) instanceof MappingJackson2HttpMessageConverter) {
+                // 如果是 Knife4j 的转换器，跳过
+                if (converters.get(i).getSupportedMediaTypes().toString().contains("application/json-patch+json")) {
+                    continue;
+                }
+                converters.set(i, converter);
+                return;
+            }
+        }
+        // 如果没找到可替换的转换器，就添加到第一个位置
         converters.add(0, converter);
     }
 
@@ -102,4 +113,5 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
+
 }

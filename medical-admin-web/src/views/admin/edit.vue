@@ -108,7 +108,9 @@
           </el-col>
         </el-row>
 
-
+        <el-form-item label="头像" prop="avatar">
+          <ImageUpload v-model="adminForm.avatar" :disabled="adminForm.status === 1" />
+        </el-form-item>
 
         <el-form-item>
           <el-button type="primary" @click="handleSubmit" :loading="submitLoading" :disabled="adminForm.status === 1">
@@ -128,6 +130,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { updateAdmin } from '@/api/user'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 const router = useRouter()
 const route = useRoute()
