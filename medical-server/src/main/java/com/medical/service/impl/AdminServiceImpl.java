@@ -6,6 +6,7 @@ import com.medical.context.BaseContext;
 import com.medical.dto.AdminAddDTO;
 import com.medical.dto.AdminLoginDTO;
 import com.medical.dto.AdminPageQueryDTO;
+import com.medical.dto.AdminUpdateDTO;
 import com.medical.entity.Admin;
 import com.medical.exception.AdminStatusErrorException;
 import com.medical.exception.PasswordErrorException;
@@ -18,8 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service // SpringIOC注解
@@ -86,8 +89,8 @@ public class AdminServiceImpl implements AdminService {
     public PageResult page(AdminPageQueryDTO adminPageQueryDTO) {
         PageHelper.startPage(adminPageQueryDTO.getPage(), adminPageQueryDTO.getPageSize());
         Page<Admin> page = adminMapper.page(adminPageQueryDTO);
-        // TODO：处理时间格式处理
 
+        // 通过WebMvcConfiguration处理时间格式处理
 
         return new PageResult(page.getTotal(), page.getResult());
     }
@@ -112,16 +115,16 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 修改管理员信息
-     * @param adminLoginDTO 管理员信息
+     * @param adminUpdateDTO 管理员信息
      */
     @Override
-    public void update(AdminAddDTO adminLoginDTO) {
-        Admin adminDB = adminMapper.getAdminByUsername(adminLoginDTO.getUsername());
+    public void update(AdminUpdateDTO adminUpdateDTO) {
+        Admin adminDB = adminMapper.getAdminByUsername(adminUpdateDTO.getUsername());
         if(adminDB.getStatus() == 1){
             throw new AdminStatusErrorException("只有在禁用的情况下才能修改！");
         }
         Admin admin = new Admin();
-        BeanUtils.copyProperties(adminLoginDTO, admin);
+        BeanUtils.copyProperties(adminUpdateDTO, admin);
         adminMapper.update(admin);
     }
 
@@ -143,4 +146,19 @@ public class AdminServiceImpl implements AdminService {
         adminMapper.update(admin);
     }
 
+    /**
+     * 删除管理员
+     * @param ids List<Long>
+     */
+    @Override
+    @Transactional
+    public void delete(List<Long> ids){
+        for (Long id : ids){
+            Admin admin = adminMapper.getById(id);
+            if(admin.getStatus() == 1){
+                throw new AdminStatusErrorException("只有禁用的账号才能删除！");
+            }
+        }
+        adminMapper.deleteBatch(ids);
+    }
 }

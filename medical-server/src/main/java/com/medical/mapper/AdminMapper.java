@@ -6,7 +6,10 @@ import com.medical.dto.AdminPageQueryDTO;
 import com.medical.entity.Admin;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface AdminMapper {
@@ -25,7 +28,7 @@ public interface AdminMapper {
      */
     @AutoFill(AutoFill.OperationType.INSERT)
     @Insert("insert into admin (username, password, real_name, phone, status, id_card, email, gender, age, avatar, create_time, update_time, create_admin, update_admin) " +
-            "values (#{username}, #{password}, #{realName}, #{phone}, #{status}, #{idCard}, #{email}, #{sex}, #{age}, #{avatar}, #{createTime}, #{updateTime}, #{createAdmin}, #{updateAdmin})")
+            "values (#{username}, #{password}, #{realName}, #{phone}, #{status}, #{idCard}, #{email}, #{gender}, #{age}, #{avatar}, #{createTime}, #{updateTime}, #{createAdmin}, #{updateAdmin})")
     void insert(Admin admin);
 
     /**
@@ -49,4 +52,10 @@ public interface AdminMapper {
      */
     @Select("select * from admin where id = #{id}")
     Admin getById(Long id);
+
+    /**
+     * 批量删除用户
+     * @param ids 用户ID列表
+     */
+    int deleteBatch(@Param("ids") List<Long> ids);
 }

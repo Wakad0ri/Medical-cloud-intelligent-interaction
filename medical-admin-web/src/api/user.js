@@ -64,3 +64,14 @@ export const updateAdminPassword = (password, newPassword) => {
     }
   })
 }
+
+// 删除管理员（支持单个和批量）
+export const deleteAdmin = (ids) => {
+  const idArray = Array.isArray(ids) ? ids : [ids]
+  // 构建查询字符串：ids=1&ids=2&ids=3
+  const queryString = idArray.map(id => `ids=${id}`).join('&')
+  return request({
+    url: `/admin/delete?${queryString}`,
+    method: 'delete'
+  })
+}

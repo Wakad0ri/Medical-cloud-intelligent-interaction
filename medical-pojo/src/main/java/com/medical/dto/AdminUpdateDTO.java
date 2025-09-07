@@ -3,22 +3,14 @@ package com.medical.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import java.io.Serializable;
-
-/**
- * 管理员新增请求
- * 需要：用户名，用户密码，真实姓名，手机号，身份证号，邮箱，性别，年龄
- *      头像（可有可无）
- */
 @Data
-@Schema(description = "管理员新增请求")
-public class AdminAddDTO implements Serializable {
+public class AdminUpdateDTO {
+
+    @Schema(description = "用户ID")
+    private Long id;
 
     @Schema(description = "用户名")
     private String username;
-
-    @Schema(description = "密码")
-    private String password;
 
     @Schema(description = "姓名")
     private String realName;
@@ -40,4 +32,8 @@ public class AdminAddDTO implements Serializable {
 
     @Schema(description = "头像")
     private String avatar;
+
+    @Schema(description = "状态")
+    private Integer status;
+
 }

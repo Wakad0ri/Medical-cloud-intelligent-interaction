@@ -45,7 +45,7 @@ public class Admin implements Serializable {
     private String email;
 
     @Schema(description = "性别")
-    private Integer sex;
+    private Integer gender;
 
     @Schema(description = "年龄")
     private Integer age;

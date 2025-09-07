@@ -76,8 +76,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="性别" prop="sex">
-              <el-radio-group v-model="adminForm.sex" :disabled="adminForm.status === 1">
+            <el-form-item label="性别" prop="gender">
+              <el-radio-group v-model="adminForm.gender" :disabled="adminForm.status === 1">
                 <el-radio :label="1">男</el-radio>
                 <el-radio :label="0">女</el-radio>
               </el-radio-group>
@@ -146,8 +146,9 @@ const adminForm = reactive({
   phone: '',
   email: '',
   idCard: '',
-  sex: 1,
+  gender: 1,
   age: '',
+  avatar: '',
   status: 1
 })
 
@@ -220,7 +221,17 @@ onMounted(() => {
   if (route.query.admin) {
     try {
       const adminData = JSON.parse(decodeURIComponent(route.query.admin))
-      Object.assign(adminForm, adminData)
+      // 只复制AdminUpdateDTO中包含的字段，排除password等字段
+      adminForm.id = adminData.id
+      adminForm.username = adminData.username
+      adminForm.realName = adminData.realName
+      adminForm.phone = adminData.phone
+      adminForm.email = adminData.email
+      adminForm.idCard = adminData.idCard
+      adminForm.gender = adminData.gender
+      adminForm.age = adminData.age
+      adminForm.avatar = adminData.avatar || ''
+      adminForm.status = adminData.status
     } catch (error) {
       console.error('解析员工信息失败:', error)
       ElMessage.error('获取员工信息失败')

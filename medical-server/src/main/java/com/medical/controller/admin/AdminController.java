@@ -2,6 +2,7 @@ package com.medical.controller.admin;
 
 import com.medical.dto.AdminAddDTO;
 import com.medical.dto.AdminPageQueryDTO;
+import com.medical.dto.AdminUpdateDTO;
 import com.medical.properties.JwtProperties;
 import com.medical.result.PageResult;
 import com.medical.utils.JwtUtil;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 // @Autowired       是 Spring IoC 的注解
@@ -110,9 +112,9 @@ public class AdminController {
 
     @PutMapping("/update")
     @Operation(summary = "修改管理员信息")
-    public Result<String> update(@RequestBody AdminAddDTO adminAddDTO){
-        log.info("修改管理员信息：{}", adminAddDTO);
-        adminService.update(adminAddDTO);
+    public Result<String> update(@RequestBody AdminUpdateDTO adminUpdateDTO){
+        log.info("修改管理员信息：{}", adminUpdateDTO);
+        adminService.update(adminUpdateDTO);
         return Result.success();
     }
 
@@ -121,6 +123,14 @@ public class AdminController {
     public Result<String> updatePassword(@RequestParam("password") String password, @RequestParam("newPassword") String newPassword){
         log.info("修改当前管理员密码");
         adminService.password(password, newPassword);
+        return Result.success();
+    }
+
+    @DeleteMapping("/delete")
+    @Operation(summary = "删除管理员")
+    public Result<String> delete(@RequestParam("ids") List<Long> ids){
+        log.info("删除管理员：{}", ids);
+        adminService.delete(ids);
         return Result.success();
     }
 

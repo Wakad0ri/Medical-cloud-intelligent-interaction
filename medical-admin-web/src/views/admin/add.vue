@@ -85,10 +85,10 @@
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="性别" prop="sex">
-              <el-select v-model="adminForm.sex" placeholder="请选择性别" style="width: 100%">
-                <el-option label="男" value="1" />
-                <el-option label="女" value="0" />
+            <el-form-item label="性别" prop="gender">
+              <el-select v-model="adminForm.gender" placeholder="请选择性别" style="width: 100%">
+                <el-option label="男" :value="1" />
+                <el-option label="女" :value="0" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -148,7 +148,7 @@ const adminForm = reactive({
   phone: '',
   idCard: '',
   email: '',
-  sex: '',
+  gender: '',
   age: null,
   avatar: ''
 })
@@ -179,7 +179,7 @@ const adminRules = {
     { required: true, message: '请输入邮箱', trigger: 'blur' },
     { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
   ],
-  sex: [
+  gender: [
     { required: true, message: '请选择性别', trigger: 'change' }
   ],
   age: [

@@ -39,10 +39,20 @@
     <el-card class="operation-card">
       <div class="operation-header">
         <h3>员工列表</h3>
-        <el-button type="primary" @click="handleAdd" class="add-btn">
-          <el-icon><Plus /></el-icon>
-          新增员工
-        </el-button>
+        <div class="operation-buttons">
+          <el-button
+            type="danger"
+            @click="handleBatchDelete"
+            :disabled="selectedIds.length === 0"
+          >
+            <el-icon><Delete /></el-icon>
+            批量删除 ({{ selectedIds.length }})
+          </el-button>
+          <el-button type="primary" @click="handleAdd" class="add-btn">
+            <el-icon><Plus /></el-icon>
+            新增员工
+          </el-button>
+        </div>
       </div>
     </el-card>
 
@@ -54,23 +64,25 @@
         stripe
         style="width: 100%"
         empty-text="暂无数据"
+        @selection-change="handleSelectionChange"
       >
+        <el-table-column type="selection" width="55" />
         <el-table-column prop="realName" label="员工姓名" min-width="120" />
-        <el-table-column prop="username" label="账号" min-width="100" />
-        <el-table-column prop="phone" label="手机号" min-width="130" />
-        <el-table-column prop="status" label="账号状态" min-width="100" align="center">
+        <el-table-column prop="username" label="账号" min-width="120" />
+        <el-table-column prop="phone" label="手机号" min-width="140" />
+        <el-table-column prop="status" label="账号状态" width="100" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'">
               {{ row.status === 1 ? '启用' : '禁用' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="updateTime" label="最后操作时间" min-width="160">
+        <el-table-column prop="updateTime" label="最后操作时间" min-width="180">
           <template #default="{ row }">
             {{ row.updateTime || '暂无记录' }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150" fixed="right" align="center">
+        <el-table-column label="操作" width="240" fixed="right" align="center">
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleEdit(row)">
               修改
@@ -82,6 +94,14 @@
               :loading="row.statusLoading"
             >
               {{ row.status === 1 ? '禁用' : '启用' }}
+            </el-button>
+            <el-button
+              type="danger"
+              size="small"
+              @click="handleDelete(row)"
+              :loading="row.deleteLoading"
+            >
+              删除
             </el-button>
           </template>
         </el-table-column>
@@ -107,8 +127,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-import { getAdminPage, updateAdminStatus } from '@/api/user'
+import { Search, Refresh, Plus, Delete } from '@element-plus/icons-vue'
+import { getAdminPage, updateAdminStatus, deleteAdmin } from '@/api/user'
 
 const router = useRouter()
 
@@ -131,6 +151,9 @@ const pagination = reactive({
 // 员工列表
 const adminList = ref([])
 
+// 选中的员工ID列表
+const selectedIds = ref([])
+
 // 获取员工列表
 const getAdminList = async () => {
   loading.value = true
@@ -144,11 +167,12 @@ const getAdminList = async () => {
 
     const response = await getAdminPage(params)
     if (response.code === 1) {
-      // 为每个员工添加statusLoading状态
+      // 为每个员工添加statusLoading和deleteLoading状态
       console.log('后端返回的数据:', response.data.records)
       adminList.value = response.data.records.map(admin => ({
         ...admin,
-        statusLoading: false
+        statusLoading: false,
+        deleteLoading: false
       }))
       pagination.total = response.data.total
     } else {
@@ -247,7 +271,88 @@ const handleToggleStatus = async (row) => {
   }
 }
 
+// 选择变化处理
+const handleSelectionChange = (selection) => {
+  selectedIds.value = selection.map(item => item.id)
+}
 
+// 单个删除
+const handleDelete = async (row) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除员工"${row.realName}"吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    row.deleteLoading = true
+
+    const response = await deleteAdmin([row.id])
+    if (response.code === 1) {
+      ElMessage.success('删除成功')
+      getAdminList() // 重新加载列表
+    } else {
+      ElMessage.error(response.msg || '删除失败')
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('删除失败:', error)
+      if (error.msg) {
+        ElMessage.error(error.msg)
+      } else if (error.response && error.response.data && error.response.data.msg) {
+        ElMessage.error(error.response.data.msg)
+      } else {
+        ElMessage.error('删除失败')
+      }
+    }
+  } finally {
+    row.deleteLoading = false
+  }
+}
+
+// 批量删除
+const handleBatchDelete = async () => {
+  if (selectedIds.value.length === 0) {
+    ElMessage.warning('请选择要删除的员工')
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除选中的 ${selectedIds.value.length} 个员工吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    const response = await deleteAdmin(selectedIds.value)
+    if (response.code === 1) {
+      ElMessage.success('批量删除成功')
+      selectedIds.value = [] // 清空选中状态
+      getAdminList() // 重新加载列表
+    } else {
+      ElMessage.error(response.msg || '批量删除失败')
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('批量删除失败:', error)
+      if (error.msg) {
+        ElMessage.error(error.msg)
+      } else if (error.response && error.response.data && error.response.data.msg) {
+        ElMessage.error(error.response.data.msg)
+      } else {
+        ElMessage.error('批量删除失败')
+      }
+    }
+  }
+}
 
 // 分页大小改变
 const handleSizeChange = (size) => {
@@ -309,6 +414,11 @@ onMounted(() => {
 .operation-header h3 {
   margin: 0;
   color: #333;
+}
+
+.operation-buttons {
+  display: flex;
+  gap: 10px;
 }
 
 .pagination-container {

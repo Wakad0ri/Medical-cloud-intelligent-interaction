@@ -42,8 +42,8 @@
             <if test="status != null">
                 status = #{status},
             </if>
-            <if test="sex != null">
-                sex = #{sex},
+            <if test="gender != null">
+                gender = #{gender},
             </if>
             <if test="age != null">
                 age = #{age},
@@ -60,6 +60,15 @@
         </set>
         where id = #{id}
     </update>
+
+    <delete id="deleteBatch">
+        DELETE FROM admin
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 
 
 </mapper>
