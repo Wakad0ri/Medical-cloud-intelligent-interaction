@@ -104,9 +104,9 @@ public class AdminController {
 
     @PutMapping("/status/{status}")
     @Operation(summary = "启用禁用管理员")
-    public Result<String> startOrStop(@PathVariable("status") Integer status, @RequestParam("id") Long id){
-        log.info("启用禁用管理员：{}", id);
-        adminService.startOrStop(status, id);
+    public Result<String> startOrStop(@PathVariable("status") Integer status, @RequestParam("ids") List<Long> ids){
+        log.info("启用禁用管理员：{}", ids);
+        adminService.startOrStop(status, ids);
         return Result.success();
     }
 

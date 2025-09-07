@@ -97,20 +97,23 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 启用禁用管理员
+     *
      * @param status 状态
-     * @param id 管理员ID
+     * @param ids    管理员ID
      */
     @Override
-    public void startOrStop(Integer status, Long id) {
+    public void startOrStop(Integer status, List<Long> ids) {
         Long nowId = BaseContext.getCurrentId();
-        if (Objects.equals(id, nowId)){
+        if (ids.contains(nowId)){
             throw new AdminStatusErrorException("不能禁用自己");
         }
-        Admin admin = Admin.builder()
-                .id(id)
-                .status(status)
-                .build();
-        adminMapper.update(admin);
+        for (Long id : ids) {
+            Admin admin = Admin.builder()
+                    .id(id)
+                    .status(status)
+                    .build();
+            adminMapper.update(admin);
+        }
     }
 
     /**

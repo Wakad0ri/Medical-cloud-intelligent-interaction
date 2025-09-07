@@ -41,6 +41,22 @@
         <h3>员工列表</h3>
         <div class="operation-buttons">
           <el-button
+            type="success"
+            @click="handleBatchEnable"
+            :disabled="selectedIds.length === 0"
+          >
+            <el-icon><Check /></el-icon>
+            批量启用 ({{ selectedIds.length }})
+          </el-button>
+          <el-button
+            type="warning"
+            @click="handleBatchDisable"
+            :disabled="selectedIds.length === 0"
+          >
+            <el-icon><Close /></el-icon>
+            批量禁用 ({{ selectedIds.length }})
+          </el-button>
+          <el-button
             type="danger"
             @click="handleBatchDelete"
             :disabled="selectedIds.length === 0"
@@ -127,8 +143,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Refresh, Plus, Delete } from '@element-plus/icons-vue'
-import { getAdminPage, updateAdminStatus, deleteAdmin } from '@/api/user'
+import { Search, Refresh, Plus, Delete, Check, Close } from '@element-plus/icons-vue'
+import { getAdminPage, updateAdminStatus, deleteAdmin, batchUpdateAdminStatus } from '@/api/user'
 
 const router = useRouter()
 
@@ -311,6 +327,86 @@ const handleDelete = async (row) => {
     }
   } finally {
     row.deleteLoading = false
+  }
+}
+
+// 批量启用
+const handleBatchEnable = async () => {
+  if (selectedIds.value.length === 0) {
+    ElMessage.warning('请选择要启用的员工')
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      `确定要启用选中的 ${selectedIds.value.length} 个员工吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    const response = await batchUpdateAdminStatus(selectedIds.value, 1)
+    if (response.code === 1) {
+      ElMessage.success('批量启用成功')
+      selectedIds.value = [] // 清空选中状态
+      getAdminList() // 重新加载列表
+    } else {
+      ElMessage.error(response.msg || '批量启用失败')
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('批量启用失败:', error)
+      if (error.msg) {
+        ElMessage.error(error.msg)
+      } else if (error.response && error.response.data && error.response.data.msg) {
+        ElMessage.error(error.response.data.msg)
+      } else {
+        ElMessage.error('批量启用失败')
+      }
+    }
+  }
+}
+
+// 批量禁用
+const handleBatchDisable = async () => {
+  if (selectedIds.value.length === 0) {
+    ElMessage.warning('请选择要禁用的员工')
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      `确定要禁用选中的 ${selectedIds.value.length} 个员工吗？`,
+      '提示',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    )
+
+    const response = await batchUpdateAdminStatus(selectedIds.value, 0)
+    if (response.code === 1) {
+      ElMessage.success('批量禁用成功')
+      selectedIds.value = [] // 清空选中状态
+      getAdminList() // 重新加载列表
+    } else {
+      ElMessage.error(response.msg || '批量禁用失败')
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('批量禁用失败:', error)
+      if (error.msg) {
+        ElMessage.error(error.msg)
+      } else if (error.response && error.response.data && error.response.data.msg) {
+        ElMessage.error(error.response.data.msg)
+      } else {
+        ElMessage.error('批量禁用失败')
+      }
+    }
   }
 }
 

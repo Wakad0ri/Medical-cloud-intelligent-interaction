@@ -50,6 +50,21 @@
             converters.add(0, converter);
         }
 -->
+
+<!-- 专题四：关于MyBatis -->
+<!--
+    专题四：关于MyBatis
+
+    一、关于@RequestParam注解什么情况才需要加？
+    答：最好是在不需要加@RequestBody和@@PathVariable注解的参数
+       时加上@RequestParam注解
+
+    二、关于在Mapper.java中方法参数加入@Param注解是为什么？
+    答：新版本MyBatis：更严格的参数绑定，建议明确使用@Param
+       若有多个参数：必须使用@Param明确指定参数名，否则会出现参数绑定错误
+
+    三、数据库中BigInt 对应 Java中的Long
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0

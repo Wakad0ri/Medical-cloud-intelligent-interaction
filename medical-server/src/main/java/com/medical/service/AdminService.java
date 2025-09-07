@@ -18,7 +18,7 @@ public interface AdminService {
 
     PageResult page(AdminPageQueryDTO adminPageQueryDTO);
 
-    void startOrStop(Integer status, Long id);
+    void startOrStop(Integer status, List<Long> ids);
 
     void update(AdminUpdateDTO adminLoginDTO);
 

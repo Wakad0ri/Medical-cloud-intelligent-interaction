@@ -35,11 +35,23 @@ export const getAdminPage = (params) => {
   })
 }
 
-// 启用/禁用管理员账号
+// 启用/禁用管理员账号（单个）
 export const updateAdminStatus = (id, status) => {
   console.log('API调用参数:', { id, status })
   return request({
-    url: `/admin/status/${status}?id=${id}`,
+    url: `/admin/status/${status}`,
+    method: 'put',
+    params: {
+      ids: [id]
+    }
+  })
+}
+
+// 批量启用/禁用管理员账号
+export const batchUpdateAdminStatus = (ids, status) => {
+  const queryString = ids.map(id => `ids=${id}`).join('&')
+  return request({
+    url: `/admin/status/${status}?${queryString}`,
     method: 'put'
   })
 }
