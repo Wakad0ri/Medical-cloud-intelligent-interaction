@@ -1,10 +1,15 @@
 import request from '@/utils/request'
 
+/**
+ * 通用API (CommonController)
+ * 路径前缀: /admin/common
+ */
+
 // 文件上传
 export const uploadFile = (file) => {
   const formData = new FormData()
   formData.append('file', file)
-
+  
   return request({
     url: '/admin/common/upload',
     method: 'post',
@@ -12,14 +17,5 @@ export const uploadFile = (file) => {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
-  })
-}
-
-// 删除文件
-export const deleteFile = (fileUrl) => {
-  return request({
-    url: '/common/delete',
-    method: 'delete',
-    params: { fileUrl }
   })
 }

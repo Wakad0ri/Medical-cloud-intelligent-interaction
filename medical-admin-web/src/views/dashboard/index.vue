@@ -92,7 +92,7 @@
               <el-icon><User /></el-icon>
               用户管理
             </el-button>
-            <el-button type="success" @click="$router.push('/doctors')">
+            <el-button type="success" @click="$router.push('/admin/doctors')">
               <el-icon><Avatar /></el-icon>
               医生管理
             </el-button>

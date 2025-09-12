@@ -42,17 +42,17 @@ export const updateAdminStatus = (id, status) => {
     url: `/admin/status/${status}`,
     method: 'put',
     params: {
-      ids: [id]
+      ids: [id].join(',')
     }
   })
 }
 
 // 批量启用/禁用管理员账号
 export const batchUpdateAdminStatus = (ids, status) => {
-  const queryString = ids.map(id => `ids=${id}`).join('&')
   return request({
-    url: `/admin/status/${status}?${queryString}`,
-    method: 'put'
+    url: `/admin/status/${status}`,
+    method: 'put',
+    params: { ids: ids.join(',') }
   })
 }
 

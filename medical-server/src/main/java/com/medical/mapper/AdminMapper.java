@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.medical.annotation.AutoFill;
 import com.medical.dto.AdminPageQueryDTO;
 import com.medical.entity.Admin;
+import com.medical.options.AdminOptions;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -58,4 +59,11 @@ public interface AdminMapper {
      * @param ids 用户ID列表
      */
     int deleteBatch(@Param("ids") List<Long> ids);
+
+    /**
+     * 获取用户选项
+     * @return 用户选项列表
+     */
+    @Select("select id, real_name as adminName from admin where status = 1 order by real_name")
+    List<AdminOptions> options();
 }

@@ -4,6 +4,19 @@ Tip：
     只需要在配置属性类才需要@Component
     对应的，只有在有@Component, Service, Controller ...
     才需要加 @Bean
+
+    在进行修改单条数据的DTO设计的时候一定要设置id，否则会找不到修改的是哪条数据
+    还有就是在进行VO设计的时候，添加id属性
+
+    在xml编写sql语句时，不要加“分号；”，否则会报错
+
+    关于如何在 增加医生 里绑定科室时，如何让前端输入科室名，但是后端改成id？
+    答：创建一个DTO类，添加临时字段，用于前端传递，后端不映射数据库
+    然后在Controller中，将前端传递的科室名转换为id，再传递给Service
+    因为Controller负责数据转换，Service专注业务逻辑
+
+    如果你要实现下拉框实现的是名字而非id？
+      答：创建一个Option类存放名称和id，创建对应的/xxx-options的Get接口
 -->
 
 
@@ -112,7 +125,7 @@ Tip：
     答:
         1）在此之前导入依赖：aliyun-sdk-oss
         2）创建一个 properties/AliOssProperties 用来 从yml获取并存放配置阿里云的OSS 的属性
-            注解：@ConfigurationProperties(prefix = "medical.oss")表示获取yml中的属性并存放
+            注解：@ConfigurationProperties(prefix = "aliyun.oss")表示获取yml中的属性并存放
             endpoint, accessKeyId, accessKeySecret, bucketName
         3）创建一个核心工具类：AliOssUtil，不用@Component
             属性设置：endpoint、accessKeyId、accessKeySecret, bucketName
@@ -124,6 +137,7 @@ Tip：
                 ossClient.putObject(bucketName, fileName, new ByteArrayInputStream(bytes))
                 ... -> ossClient.shutdown();
             - 构建访问URL
+                !!!格式：http:// {bucketName} . {endpoint.replace("https://", "")} / {fileName}
                 StringBuilder url = new StringBuilder("http://");
                 url.append(bucketName).append(".").append(endpoint.replace("https://", ""))
                 .append("/").append(fileName);
@@ -132,6 +146,13 @@ Tip：
             public AliOssUtil aliOssUtil(AliOssProperties aliOssProperties){
                 return new AliOssUtil(aliOssProperties.四个get);
             }
+        5）创建common/Controller中创建接口：
+            - 上传文件：admin/common/upload  |   Method： POST
+            - 请求参数：MultipartFile file
+            - 过程：
+                · 通过 file.getOriginalFilename() 获取 全文件名 -> 通过分割字符串获得 拓展名
+                · 通过UUid.randomUUID() 获取加工后的文件名 -> 和 拓展名 组合 -> 拼接成新的文件名
+                · 通过阿里云工具类上传文件{ aliOssUtil.update(file.getByte(), 新文件名) }
 -->
 
 <!-- 专题四：关于MyBatis -->

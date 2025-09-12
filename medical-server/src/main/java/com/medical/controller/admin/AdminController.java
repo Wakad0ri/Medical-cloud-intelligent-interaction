@@ -3,6 +3,7 @@ package com.medical.controller.admin;
 import com.medical.dto.AdminAddDTO;
 import com.medical.dto.AdminPageQueryDTO;
 import com.medical.dto.AdminUpdateDTO;
+import com.medical.options.AdminOptions;
 import com.medical.properties.JwtProperties;
 import com.medical.result.PageResult;
 import com.medical.utils.JwtUtil;
@@ -86,6 +87,11 @@ public class AdminController {
     }
 
 
+    /**
+     * 添加管理员
+     * @param adminAddDTO （json）
+     * @return Result<String>
+     */
     @PostMapping("/add")
     @Operation(summary = "添加管理员")
     public Result<String> add(@RequestBody AdminAddDTO adminAddDTO){
@@ -94,6 +100,11 @@ public class AdminController {
         return Result.success();
     }
 
+    /**
+     * 分页查询管理员
+     * @param adminPageQueryDTO （
+     * @return Result<PageResult>
+     */
     @GetMapping("/page")
     @Operation(summary = "分页查询管理员")
     public Result<PageResult> page(AdminPageQueryDTO adminPageQueryDTO){
@@ -102,6 +113,23 @@ public class AdminController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 获取管理员选项
+     * @return Result<AdminOptions>
+     */
+    @GetMapping("/admin-options")
+    public Result<List<AdminOptions>> getOptions(){
+        log.info("获取管理员选项");
+        List<AdminOptions> adminOptions = adminService.options();
+        return Result.success(adminOptions);
+    }
+
+    /**
+     * 启用禁用管理员
+     * @param status Integer
+     * @param ids Long
+     * @return Result<String>
+     */
     @PutMapping("/status/{status}")
     @Operation(summary = "启用禁用管理员")
     public Result<String> startOrStop(@PathVariable("status") Integer status, @RequestParam("ids") List<Long> ids){
@@ -110,6 +138,11 @@ public class AdminController {
         return Result.success();
     }
 
+    /**
+     * 修改管理员信息
+     * @param adminUpdateDTO （json）
+     * @return Result<String>
+     */
     @PutMapping("/update")
     @Operation(summary = "修改管理员信息")
     public Result<String> update(@RequestBody AdminUpdateDTO adminUpdateDTO){
@@ -118,6 +151,12 @@ public class AdminController {
         return Result.success();
     }
 
+    /**
+     * 修改管理员密码
+     * @param password String
+     * @param newPassword String
+     * @return Result<String>
+     */
     @PutMapping("/password")
     @Operation(summary = "修改管理员密码")
     public Result<String> updatePassword(@RequestParam("password") String password, @RequestParam("newPassword") String newPassword){
@@ -126,6 +165,11 @@ public class AdminController {
         return Result.success();
     }
 
+    /**
+     * 删除管理员
+     * @param ids List<Long>
+     * @return Result<String>
+     */
     @DeleteMapping("/delete")
     @Operation(summary = "删除管理员")
     public Result<String> delete(@RequestParam("ids") List<Long> ids){
@@ -133,6 +177,8 @@ public class AdminController {
         adminService.delete(ids);
         return Result.success();
     }
+
+
 
 
 

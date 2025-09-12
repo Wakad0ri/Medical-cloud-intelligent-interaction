@@ -83,7 +83,13 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="realName" label="员工姓名" min-width="120" />
+        <el-table-column prop="realName" label="员工姓名" min-width="120">
+          <template #default="{ row }">
+            <el-button type="primary" link @click="handleViewDetail(row)">
+              {{ row.realName }}
+            </el-button>
+          </template>
+        </el-table-column>
         <el-table-column prop="username" label="账号" min-width="120" />
         <el-table-column prop="phone" label="手机号" min-width="140" />
         <el-table-column prop="status" label="账号状态" width="100" align="center">
@@ -136,6 +142,56 @@
         />
       </div>
     </el-card>
+
+    <!-- 管理员详情对话框 -->
+    <el-dialog
+      v-model="detailDialogVisible"
+      title="管理员详情"
+      width="600px"
+      :close-on-click-modal="false"
+    >
+      <div v-if="currentAdmin" class="admin-detail">
+        <el-descriptions :column="2" border>
+          <el-descriptions-item label="员工姓名">
+            {{ currentAdmin.realName || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="用户名">
+            {{ currentAdmin.username || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="手机号">
+            {{ currentAdmin.phone || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="邮箱">
+            {{ currentAdmin.email || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="性别">
+            {{ currentAdmin.gender === 1 ? '男' : currentAdmin.gender === 0 ? '女' : '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="年龄">
+            {{ currentAdmin.age || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="身份证号">
+            {{ currentAdmin.idCard || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="账号状态">
+            <el-tag :type="currentAdmin.status === 1 ? 'success' : 'danger'">
+              {{ currentAdmin.status === 1 ? '启用' : '禁用' }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="创建时间" :span="2">
+            {{ currentAdmin.createTime || '暂无' }}
+          </el-descriptions-item>
+          <el-descriptions-item label="更新时间" :span="2">
+            {{ currentAdmin.updateTime || '暂无' }}
+          </el-descriptions-item>
+        </el-descriptions>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="detailDialogVisible = false">关闭</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -144,7 +200,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus, Delete, Check, Close } from '@element-plus/icons-vue'
-import { getAdminPage, updateAdminStatus, deleteAdmin, batchUpdateAdminStatus } from '@/api/user'
+import { getAdminPage, updateAdminStatus, deleteAdmin, batchUpdateAdminStatus } from '@/api/admin'
 
 const router = useRouter()
 
@@ -169,6 +225,10 @@ const adminList = ref([])
 
 // 选中的员工ID列表
 const selectedIds = ref([])
+
+// 详情对话框相关
+const detailDialogVisible = ref(false)
+const currentAdmin = ref(null)
 
 // 获取员工列表
 const getAdminList = async () => {
@@ -222,6 +282,12 @@ const handleAdd = () => {
   router.push('/admin/add')
 }
 
+// 查看详情
+const handleViewDetail = (row) => {
+  currentAdmin.value = row
+  detailDialogVisible.value = true
+}
+
 // 编辑员工
 const handleEdit = (row) => {
   // 将员工信息作为查询参数传递到编辑页面
@@ -252,7 +318,7 @@ const handleToggleStatus = async (row) => {
     row.statusLoading = true
 
     console.log('调用状态更新接口:', { id: row.id, status: newStatus, idType: typeof row.id, statusType: typeof newStatus })
-    const response = await updateAdminStatus(row.id, newStatus)
+    const response = await updateAdminStatus(newStatus, [row.id])
     console.log('后端响应:', response)
     if (response.code === 1) {
       // 更新本地状态
@@ -388,7 +454,7 @@ const handleBatchDisable = async () => {
       }
     )
 
-    const response = await batchUpdateAdminStatus(selectedIds.value, 0)
+    const response = await batchUpdateAdminStatus(0, selectedIds.value)
     if (response.code === 1) {
       ElMessage.success('批量禁用成功')
       selectedIds.value = [] // 清空选中状态

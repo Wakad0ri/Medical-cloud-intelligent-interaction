@@ -47,7 +47,7 @@
               <el-icon><UserFilled /></el-icon>
               <span>员工管理</span>
             </el-menu-item>
-            <el-menu-item index="/admin/departments">
+            <el-menu-item index="/admin/department">
               <el-icon><OfficeBuilding /></el-icon>
               <span>科室管理</span>
             </el-menu-item>
@@ -124,7 +124,7 @@ import { ref, computed, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAdminStore } from '@/stores/admin'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { updateAdminPassword } from '@/api/user'
+import { updateAdminPassword } from '@/api/admin'
 import {
   User,
   ArrowDown,

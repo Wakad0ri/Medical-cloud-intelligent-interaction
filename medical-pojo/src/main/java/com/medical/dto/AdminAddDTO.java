@@ -40,4 +40,5 @@ public class AdminAddDTO implements Serializable {
 
     @Schema(description = "头像")
     private String avatar;
+
 }

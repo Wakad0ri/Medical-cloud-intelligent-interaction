@@ -12,6 +12,7 @@ import com.medical.exception.AdminStatusErrorException;
 import com.medical.exception.PasswordErrorException;
 import com.medical.exception.UsernameNotFoundException;
 import com.medical.mapper.AdminMapper;
+import com.medical.options.AdminOptions;
 import com.medical.result.PageResult;
 import com.medical.service.AdminService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -75,7 +76,7 @@ public class AdminServiceImpl implements AdminService {
         String password = DigestUtils.md5DigestAsHex(adminAddDTO.getPassword().getBytes());
         BeanUtils.copyProperties(adminAddDTO, admin);
         admin.setPassword(password);
-        admin.setStatus(1);
+        admin.setStatus(0);
 
         adminMapper.insert(admin);
     }
@@ -93,6 +94,14 @@ public class AdminServiceImpl implements AdminService {
         // 通过WebMvcConfiguration处理时间格式处理
 
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    /**
+     * 获取管理员选项
+     * @return List<AdminOptions>
+     */
+    @Override
+    public List<AdminOptions> options() {return adminMapper.options();
     }
 
     /**
@@ -164,4 +173,6 @@ public class AdminServiceImpl implements AdminService {
         }
         adminMapper.deleteBatch(ids);
     }
+
+
 }

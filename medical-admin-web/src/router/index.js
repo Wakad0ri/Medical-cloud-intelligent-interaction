@@ -57,6 +57,30 @@ const routes = [
         name: 'EditEmployee',
         component: () => import('@/views/admin/edit.vue'),
         meta: { title: '修改员工', requiresAuth: true }
+      },
+      {
+        path: 'doctors',
+        name: 'DoctorManagement',
+        component: () => import('@/views/doctors/index.vue'),
+        meta: { title: '医生管理', requiresAuth: true }
+      },
+      {
+        path: 'department',
+        name: 'DepartmentManagement',
+        component: () => import('@/views/departments/index.vue'),
+        meta: { title: '科室管理', requiresAuth: true }
+      },
+      {
+        path: 'department/add',
+        name: 'DepartmentAdd',
+        component: () => import('@/views/departments/add.vue'),
+        meta: { title: '新增科室', requiresAuth: true }
+      },
+      {
+        path: 'department/edit/:id',
+        name: 'DepartmentEdit',
+        component: () => import('@/views/departments/edit.vue'),
+        meta: { title: '编辑科室', requiresAuth: true }
       }
     ]
   }

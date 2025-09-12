@@ -126,7 +126,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { ArrowLeft } from '@element-plus/icons-vue'
-import { addAdmin } from '@/api/user'
+import { addAdmin } from '@/api/admin'
 import ImageUpload from '@/components/ImageUpload.vue'
 
 const router = useRouter()

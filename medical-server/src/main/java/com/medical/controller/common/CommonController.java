@@ -30,12 +30,11 @@ public class CommonController {
         log.info("文件上传：{}", file.getOriginalFilename());
 
         try {
-            String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String objectName = UUID.randomUUID().toString() + extension;
+            String fileName = file.getOriginalFilename();
+            String extension = fileName.substring(fileName.lastIndexOf("."));
+            String objectName = UUID.randomUUID() + extension;
 
-            String filePath = aliOssUtil.upload(file.getBytes(), objectName);
-            return Result.success(filePath);
+            return Result.success(aliOssUtil.upload(file.getBytes(), objectName));
         }catch (IOException e) {
             return Result.error("上传失败");
         }
